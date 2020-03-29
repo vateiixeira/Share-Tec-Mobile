@@ -10,7 +10,7 @@
           <i class="zmdi zmdi-font"></i>
         </span>
         <div class="wrap-input100 validate-input">
-          <input class="text" type="email" name="name" v-model="nome" placeholder="Nome">
+          <input class="text" type="text" name="name" v-model="nome" placeholder="Nome">
         </div>
 
         <div class="wrap-input100 validate-input">
@@ -50,6 +50,8 @@
 </template>
 
 <script>
+import axios from 'Axios'
+
 export default {
   name: 'Login',
   data () {
@@ -62,7 +64,30 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log('12313123')
+      let form = new FormData()
+      form.append('email', this.email)
+      form.append('password', this.password)
+      form.append('first_name', this.nome)
+      form.append('username', this.apelido)
+      axios.post(`http://192.168.1.5:8000/api/register`, form).then(
+        response => {
+          this.$q.notify({
+            type: 'positive',
+            position: 'top',
+            message: 'Cadastro realizado com sucesso!'
+          })
+          this.$router.push('/')
+        }
+      )
+        .catch(error => {
+          this.$q.notify({
+            color: 'negative',
+            position: 'top',
+            message: 'Error! Valide os campos e tente novamente.',
+            icon: 'report_problem'
+          })
+          console.log(error)
+        })
     }
   }
 }

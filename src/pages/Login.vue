@@ -34,9 +34,11 @@
             Nao tem conta?
           </span>
 
-          <a class="txt2" href="#">
+          <router-link to="register">
+          <a class="txt2" >
             Registrar!
           </a>
+          </router-link>
         </div>
       </q-form>
     </div>
@@ -45,6 +47,8 @@
 </template>
 
 <script>
+import axios from 'Axios'
+
 export default {
   name: 'Login',
   data () {
@@ -55,7 +59,27 @@ export default {
   },
   methods: {
     onSubmit () {
-      console.log('12313123')
+      var formData = new FormData()
+      formData.append('email', this.email)
+      formData.append('password', this.password)
+      axios.post('http://192.168.1.5:8000/rest-auth/login/', formData)
+        .then(response => {
+          if (response.status === 200) {
+            this.$store.state.logado.status = true
+            this.$q.notify({
+              type: 'positive',
+              message: 'Logado com sucesso!',
+              position: 'top' })
+            axios.get(`http://192.168.1.5:8000/api/get_user_name/${this.email}`)
+              .then(response => {
+                this.$store.state.logado.id = response.data.id
+              })
+          }
+        })
+        .catch(error => {
+          console.log(error)
+          this.$q.notify('Dados incorretos, tente novamente!')
+        })
     }
   }
 }

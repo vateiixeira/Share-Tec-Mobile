@@ -7,14 +7,17 @@ const routes = [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'account', component: () => import('pages/Account.vue') },
       { path: 'filtro', component: () => import('pages/Filtro.vue') },
-      { path: 'favoritos', component: () => import('pages/Favoritos.vue') },
-      { path: '/product/:product', props: true, component: () => import('pages/Product.vue') }
+      { path: 'favoritos', name: 'favorito', component: () => import('pages/Favoritos.vue') },
+      { path: '/product/:product', name: 'produto', props: true, component: () => import('pages/Product.vue') },
+      { path: '/publish', component: () => import('pages/Publish.vue') },
+      { path: '/login', component: () => import('pages/Login.vue') }
     ]
   },
-  {
-    path: '/login',
-    component: () => import('pages/Login.vue')
-  },
+  // {
+  //   path: '/login',
+  //   name: 'login',
+  //   component: () => import('pages/Login.vue')
+  // },
   {
     path: '/register',
     component: () => import('pages/Register.vue')

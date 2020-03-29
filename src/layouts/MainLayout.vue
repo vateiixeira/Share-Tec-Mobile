@@ -1,8 +1,9 @@
 <template>
+<div v-if="status">
   <q-layout view="lHh Lpr lFf">
      <q-header elevated class="bg-cyan-8">
         <q-toolbar>
-          <q-toolbar-title>Share Tech</q-toolbar-title>
+          <q-toolbar-title></q-toolbar-title>
           <!-- <router-link to="filtro" class="btnFiltro">
           <q-btn flat round dense icon="fas fa-sort" />
           </router-link> -->
@@ -45,7 +46,7 @@
           </router-link>
 
         <router-link to="favoritos" class="tive" >
-            <q-item active clickable v-ripple>
+            <q-item active clickable v-ripple class="tive">
               <q-item-section avatar>
                 <q-icon name="far fa-heart" />
               </q-item-section>
@@ -55,6 +56,30 @@
               </q-item-section>
             </q-item>
         </router-link>
+
+        <router-link to="publish" class="tive" >
+            <q-item active clickable v-ripple class="tive">
+              <q-item-section avatar>
+                <q-icon name="fas fa-arrow-up"  />
+              </q-item-section>
+
+              <q-item-section>
+                Anunciar!
+              </q-item-section>
+            </q-item>
+        </router-link>
+
+        <!-- <router-link to="login" class="tive" >
+            <q-item active clickable v-ripple class="tive">
+              <q-item-section avatar>
+                <q-icon name="fas fa-times" />
+              </q-item-section>
+
+              <q-item-section>
+                Sair!
+              </q-item-section>
+            </q-item>
+        </router-link> -->
 
           </q-list>
         </q-scroll-area>
@@ -74,21 +99,33 @@
       <router-view />
     </q-page-container>
   </q-layout>
+  </div>
+<div v-else>
+   <Login />
+</div>
 </template>
 
 <script>
+import Login from 'pages/Login.vue'
+import { mapState } from 'vuex'
 
 export default {
   name: 'MainLayout',
+  components: {
+    Login
+  },
   data () {
     return {
       drawer: false
     }
+  },
+  computed: {
+    ...mapState('logado', ['status'])
   }
 }
 </script>
 
-<style lang="stylus">
+<style>
 
 .tive {
   color: black;
