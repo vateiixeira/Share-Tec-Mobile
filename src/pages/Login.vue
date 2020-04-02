@@ -62,7 +62,7 @@ export default {
       var formData = new FormData()
       formData.append('email', this.email)
       formData.append('password', this.password)
-      axios.post('http://192.168.1.5:8000/rest-auth/login/', formData)
+      axios.post('https://share-tech.herokuapp.com/rest-auth/login/', formData)
         .then(response => {
           if (response.status === 200) {
             this.$store.state.logado.status = true
@@ -70,9 +70,17 @@ export default {
               type: 'positive',
               message: 'Logado com sucesso!',
               position: 'top' })
-            axios.get(`http://192.168.1.5:8000/api/get_user_name/${this.email}`)
+            axios.get(`https://share-tech.herokuapp.com/api/get_user_name/${this.email}`)
               .then(response => {
                 this.$store.state.logado.id = response.data.id
+                this.$store.state.logado.username = response.data.username
+                axios.get(`https://share-tech.herokuapp.com/api/avatar/${response.data.id}/`)
+                  .then(response => {
+                    this.$store.state.logado.avatar = response.data.avatar
+                  })
+                  .catch(error => {
+                    console.log(error)
+                  })
               })
           }
         })

@@ -1,5 +1,6 @@
 <template>
 <div class="q-pa-md">
+  <div class=""  v-if="!loading">
       <q-carousel
       v-model="slide"
       transition-prev="slide-right"
@@ -36,16 +37,10 @@
       label="Nome"
       />
       <q-input
-      v-model="modelo"
+      v-model="marca_modelo"
       filled
       autogrow
-      label="Modelo"
-      />
-      <q-input
-      v-model="marca"
-      filled
-      autogrow
-      label="Marca"
+      label="Marca / Modelo"
       />
       <q-input
       v-model="preco"
@@ -72,13 +67,26 @@
       />
     <img :src="imageSrc">
 
-<div class="teste">    <q-btn color="primary" label="Publicar" @click="submit" /> </div>
-<!-- <q-input v-model="id"/> -->
+<div class="teste">
+  <q-btn color="primary" label="Publicar" @click="submit" />
+  </div>
+</div>
+
+<div class="loading" v-if="loading">
+    <loading :active.sync="loading"
+    :can-cancel="true"
+    :on-cancel="onCancel"
+    :is-full-page="fullPage"></loading>
+</div>
 
 </div>
 </template>
 
 <script>
+// Import component
+import Loading from 'vue-loading-overlay'
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css'
 import axios from 'axios'
 
 export default {
@@ -92,12 +100,16 @@ export default {
       dense: false,
       aceitaCartao: false,
       nome: '',
-      modelo: '',
-      marca: '',
+      marca_modelo: '',
       descricao: '',
       preco: '',
-      imgUpload: []
+      imgUpload: [],
+      loading: false,
+      fullPage: true
     }
+  },
+  components: {
+    Loading
   },
   methods: {
     captureImage () {
@@ -108,26 +120,13 @@ export default {
           this.imgUpload.push(blob)
           let formData = new FormData()
           formData.append('img', blob, 'img.jpg')
-
-          // axios.post(`http://192.168.0.101:8000/api/img`, formData, {
-          //   headers: {
-          //     'content-Type': 'multipart/form-data'
-          //   }
-          // })
-          //   .then(response => {
-          //     this.$q.notify('deu certo')
-          //     // insere os valores na lista de opcoes
-          //   })
-          //   .catch(error => {
-          //     console.log(error.response)
-          //   })
         },
         () => { // on fail
-          this.$q.notify('Could not access device camera.')
+          this.$q.notify('Nao foi possivel acessar a camera. Contate o administrador do sistema.')
         },
         {
           // camera options
-          quality: 100,
+          quality: 20,
           destinationType: navigator.camera.DestinationType.DATA_URL
         }
       )
@@ -157,6 +156,7 @@ export default {
       return blob
     },
     submit () {
+      this.loading = true
       let form = new FormData()
       form.append('nome', this.nome)
       form.append('modelo', this.modelo)
@@ -169,25 +169,40 @@ export default {
       form.append('aceita_cartao', this.aceitaCartao)
       form.append('vendedor', this.id)
       form.append('vendedor', this.id)
-      form.append('img', this.imgUpload[0], 'img.jpg')
-      form.append('img2', this.imgUpload[1], 'img2.jpg')
-      form.append('img3', this.imgUpload[2], 'img3.jpg')
-      form.append('img4', this.imgUpload[3], 'img4.jpg')
-      form.append('img5', this.imgUpload[4], 'img5.jpg')
+      var i = 0
+      for (i = 1; i <= this.imgUpload.length; i++) {
+        // LOOP PARA INSERIR AS IMAGENS NO ARRAY E ADD AO FORM DATA
+        form.append(`img${i}`, this.imgUpload[i - 1], `img${i}.jpg`)
+        console.log(`img${i} ||| img${i}.jpg`)
+        console.log(this.imgUpload.length)
+      }
+      console.log(form)
+      // form.append('img', this.imgUpload[0], 'img.jpg')
+      // form.append('img2', this.imgUpload[1], 'img2.jpg')
+      // form.append('img3', this.imgUpload[2], 'img3.jpg')
+      // form.append('img4', this.imgUpload[3], 'img4.jpg')
+      // form.append('img5', this.imgUpload[4], 'img5.jpg')
+
+      // LEMBRAR DE ARRUMA ESSA PORR AQUI
       form.append('create_at', '2018-03-18')
       form.append('updated_at', '2018-03-18')
 
-      axios.post(`http://192.168.1.5:8000/api/product/`, form, {
+      axios.post(`https://share-tech.herokuapp.com/api/product/`, form, {
         headers: {
           'content-Type': 'multipart/form-data'
         }
       })
         .then(response => {
-          this.$q.notify('deu certo')
+          this.loading = false
+          console.log(response.data)
+          this.$router.push({ name: 'produto', params: { product: response.data.id } })
           // insere os valores na lista de opcoes
         })
         .catch(error => {
           console.log(error.response)
+          setTimeout(() => {
+            this.loading = false
+          }, 5000)
         })
     },
     data () {
@@ -214,5 +229,9 @@ export default {
   .teste {
     margin-top: 15px;
     margin-right: 15px;
+  }
+  .loading {
+    size: 300px;
+    height: 400px;
   }
 </style>

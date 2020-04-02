@@ -1,19 +1,26 @@
 <template>
+
   <q-page class="q-pa-md">
+    <loading :active.sync="loading"
+    :can-cancel="true"
+    :on-cancel="onCancel"
+    :is-full-page="fullPage">
+    </loading>
     <div class="row ">
       <div class="col-grow">
       <q-select
-      rounded outlined
-      v-model="buscar"
-      use-input
-      use-chips
-      multiple
-      hide-dropdown-icon
-      input-debounce="0"
-      new-value-mode="add-unique"
-      style="margin-bottom: 10px;"
-      label="Digite as palavras chaves para buscar o produto:"
-      /></div>
+        rounded outlined
+        v-model="buscar"
+        use-input
+        use-chips
+        multiple
+        hide-dropdown-icon
+        input-debounce="0"
+        new-value-mode="add-unique"
+        style="margin-bottom: 10px;"
+        label="Digite as palavras chaves para buscar o produto:"
+      />
+      </div>
       <div class="col-shrink">
         <q-btn round color="secondary" icon="directions" style="margin-top: 5px; margin-left: 5px"
         @click="filtrar"
@@ -27,16 +34,14 @@
       <router-link :to= "{ name: 'produto', params: {product: i.id } }" class="tive">
       <q-item clickable>
         <q-item-section top thumbnail class="q-ml-none">
-          <img :src="i.img">
+          <img :src="i.img1">
         </q-item-section>
         <q-item-section>
           <q-item-label><h6>{{ i.nome }}</h6></q-item-label>
           <q-item-label caption>
             R${{ i.preco}}
             <br/>
-            Modelo:{{ i.modelo}}
-            <br/>
-            Marca:{{ i.marca}}
+            Marca:{{ i.marca_modelo}}
             <br/>
             <span v-if="i.aceita_cartao">Aceita Cartao</span>
             <br>
@@ -53,6 +58,10 @@
 
 <script>
 import axios from 'axios'
+// Import component
+import Loading from 'vue-loading-overlay'
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css'
 
 export default {
   name: 'PageIndex',
@@ -61,18 +70,26 @@ export default {
       itens: null,
       filtrados: null,
       select: null,
-      buscar: null
+      buscar: null,
+      loading: false,
+      fullPage: true
     }
   },
   created () {
-    axios.get(`http://192.168.1.5:8000/api/product/`)
+    this.loading = true
+    axios.get(`https://share-tech.herokuapp.com/api/product/`)
       .then(response => {
         this.itens = response.data
         this.filtrados = response.data
+        this.loading = false
       })
       .catch(error => {
         console.log(error)
+        this.$q.notify('erro na pagina')
       })
+  },
+  components: {
+    Loading
   },
   methods: {
     filtrar () {

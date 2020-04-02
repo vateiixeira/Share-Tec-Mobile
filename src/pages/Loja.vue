@@ -1,6 +1,11 @@
 <template>
-  <q-page class="q-pa-md">
-    <q-list v-bind:key="i.id" v-for="i in itens" bordered padding>
+<q-page class="q-pa-md">
+        <loading :active.sync="loading"
+        :can-cancel="true"
+        :on-cancel="onCancel"
+        :is-full-page="fullPage">
+        </loading>
+    <q-list v-bind:key="i.id" v-for="i in listItens" bordered padding>
       <q-item-label header>{{ i.categoria }}</q-item-label>
       <router-link :to= "{ name: 'produto', params: {product: i.id } }" class="tive">
       <q-item clickable>
@@ -28,14 +33,23 @@
 
 <script>
 import axios from 'axios'
+// Import component
+import Loading from 'vue-loading-overlay'
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css'
 
 export default {
-  name: 'PageIndex',
+  props: ['idUser'],
   data () {
     return {
       itens: [],
-      listItens: []
+      listItens: [],
+      loading: false,
+      fullPage: true
     }
+  },
+  components: {
+    Loading
   },
   computed: {
     id: {
@@ -47,19 +61,11 @@ export default {
   },
   created () {
     // GET PARA RETORNAR USUARIO LOGADO E A LISTAGEM DOS FAVORITOS (APENAS ID DO PRODUTO É RETORNADO NO PRIMEIRO GET.)
-    axios.get(`https://share-tech.herokuapp.com/api/favoritos/${this.id}`)
+    this.loading = true
+    axios.get(`https://share-tech.herokuapp.com/api/loja/${this.id}`)
       .then(response => {
         this.listItens = response.data
-        // FAZ O LOOP PARA INSTANCIAR TODOS OS PRODUTOS FAVORITOS DAQUELE USUARIO QUE FEZ O PRIMEIRO GET
-        for (var i = 0; i < this.listItens.length; i++) {
-          axios.get(`https://share-tech.herokuapp.com/api/product/${this.listItens[i].produto}/`)
-            .then(response => {
-              this.itens.push(response.data)
-            })
-            .catch(error => {
-              console.log(error)
-            })
-        }
+        this.loading = false
       })
       .catch(error => {
         console.log(error)

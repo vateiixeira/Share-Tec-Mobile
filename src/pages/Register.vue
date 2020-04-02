@@ -69,7 +69,7 @@ export default {
       form.append('password', this.password)
       form.append('first_name', this.nome)
       form.append('username', this.apelido)
-      axios.post(`http://192.168.1.5:8000/api/register`, form).then(
+      axios.post(`https://share-tech.herokuapp.com/api/register`, form).then(
         response => {
           this.$q.notify({
             type: 'positive',

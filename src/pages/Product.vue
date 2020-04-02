@@ -9,11 +9,10 @@
         infinite
 
       >
-        <q-carousel-slide :name="1" v-bind:img-src="produto.img" />
+        <q-carousel-slide :name="1" v-bind:img-src="produto.img1" />
         <q-carousel-slide :name="2" v-bind:img-src="produto.img2" />
         <q-carousel-slide :name="3" v-bind:img-src="produto.img3" />
         <q-carousel-slide :name="4" v-bind:img-src="produto.img4" />
-        <q-carousel-slide :name="5" v-bind:img-src="produto.img5" />
       </q-carousel>
       <br/>
       <h4>R${{produto.preco}} </h4>
@@ -74,11 +73,11 @@ export default {
     }
   },
   created () {
-    axios.get(`http://192.168.1.5:8000/api/product/${this.product}/`)
+    axios.get(`https://share-tech.herokuapp.com/api/product/${this.product}/`)
       .then(response => {
         this.produto = response.data
         // GET DENTRO DO GET PARA PEGAR O DATA E PASSAR ID DO VENDEDOR NA URL
-        axios.get(`http://192.168.1.5:8000/api/user/${this.produto.vendedor}/`)
+        axios.get(`https://share-tech.herokuapp.com/api/user/${this.produto.vendedor}/`)
           .then(response => {
             this.user = response.data
           })
@@ -91,7 +90,7 @@ export default {
         console.log(error)
         this.$router.push('/Error404')
       })
-    axios.get(`http://192.168.1.5:8000/api/favoritos/${this.id}`)
+    axios.get(`https://share-tech.herokuapp.com/api/favoritos/${this.id}`)
       .then(response => {
         var result = response.data
         for (var i = 0; i < response.data.length; i++) {
@@ -108,7 +107,7 @@ export default {
       let form = new FormData()
       form.append('user', this.id)
       form.append('produto', this.product)
-      axios.post(`http://192.168.1.5:8000/api/favorito/`, form)
+      axios.post(`https://share-tech.herokuapp.com/api/favorito/`, form)
         .then(response => {
           this.$q.notify('Adicionado aos favoritos')
           this.favorito = true
